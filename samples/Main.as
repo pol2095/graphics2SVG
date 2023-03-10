@@ -5,9 +5,9 @@ package
 	
 	import com.utils.graphics2SVG;
 	
-    public class Main extends Sprite
+	public class Main extends Sprite
 	{
-        public function Main()
+		public function Main()
 		{
 			var shape:Shape = new Shape();
 			shape.graphics.beginFill(0x0000FF);
