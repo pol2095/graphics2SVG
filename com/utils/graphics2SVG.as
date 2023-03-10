@@ -42,7 +42,7 @@ package com.utils
 
 final class Fill
 {
-    import flash.display.GradientType;
+	import flash.display.GradientType;
 	import flash.display.GraphicsGradientFill;
 	import flash.display.GraphicsPath;
 	import flash.display.GraphicsSolidFill;
@@ -60,7 +60,7 @@ final class Fill
 	public static var gradients:Vector.<String>;
 	
 	private static function toHex(color:uint):String
-    {
+	{
 		var value:String = color.toString(16);
 		var length:int = value.length;
 		if( length > 6 ) value = value.substring( length - 6 );
@@ -104,12 +104,12 @@ final class Fill
 	}
 	
 	public static function graphicsEndFill(result:IGraphicsData):void
-    {
+	{
 		//
 	}
 	
 	public static function graphicsStroke(result:IGraphicsData):void
-    {
+	{
 		//var gs:GraphicsStroke = result as GraphicsStroke;
 	}
 		
