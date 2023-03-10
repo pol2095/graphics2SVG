@@ -19,5 +19,5 @@ package
 			
 			trace(svg);
 		}
-    }
+	}
 }
