@@ -16,9 +16,8 @@ package com.utils
 		var result:Vector.<IGraphicsData> = shape.graphics.readGraphicsData(recurse);
 		var width:Number = bounds.x * 2 + bounds.width;
 		var height:Number = bounds.y * 2 + bounds.height;
-		
+		trace( result );
 		XML.prettyIndent = 4;
-		Fill.path = <path/>;
 		Fill.svg = <svg xmlns={Fill.s.uri} xmlns:xlink={Fill.xlink.uri}><defs/><g/></svg>;
 		Fill.svg.@width = width + "px";
 		Fill.svg.@height = height + "px";
@@ -34,6 +33,7 @@ package com.utils
 			className = className.substr(0, 1).toLowerCase() + className.substr(1, className.length); 
 			Fill[className]( result[i] );
 		}
+		Fill.finalizePath();
 		
 		var svgString:String = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + Fill.svg.toXMLString();
 		return svgString.split("    ").join("\t");
@@ -42,6 +42,7 @@ package com.utils
 
 final class Fill
 {
+	import flash.display.CapsStyle;
 	import flash.display.GradientType;
 	import flash.display.GraphicsGradientFill;
 	import flash.display.GraphicsPath;
@@ -49,11 +50,13 @@ final class Fill
 	import flash.display.GraphicsStroke;
 	import flash.display.IGraphicsData;
 	import flash.display.InterpolationMethod;
+	import flash.display.JointStyle;
+	import flash.display.LineScaleMode;
 	import flash.display.SpreadMethod;
 	import flash.geom.Matrix;
 	
 	public static var svg:XML;
-	public static var path:XML;
+	private static var path:XML;
 	
 	public static const s:Namespace = new Namespace("s", "http://www.w3.org/2000/svg");
 	public static const xlink:Namespace = new Namespace("xlink", "http://www.w3.org/1999/xlink");
@@ -70,8 +73,9 @@ final class Fill
 	
 	public static function graphicsSolidFill(result:IGraphicsData):void
 	{
+		finalizePath();
 		var gsf:GraphicsSolidFill = result as GraphicsSolidFill;
-		path = <path/>;
+		path.@stroke = "none";
 		path.@fill = toHex(gsf.color);
 		if(gsf.alpha != 1) path.@["fill-opacity"] = gsf.alpha;
 	}
@@ -100,7 +104,6 @@ final class Fill
 			}
 		}
 		path.@d = svgS.join(" ");
-		svg.s::g.appendChild( path );
 	}
 	
 	public static function graphicsEndFill(result:IGraphicsData):void
@@ -110,18 +113,27 @@ final class Fill
 	
 	public static function graphicsStroke(result:IGraphicsData):void
 	{
-		//var gs:GraphicsStroke = result as GraphicsStroke;
+		finalizePath();
+		var gs:GraphicsStroke = result as GraphicsStroke;
+		var alpha:Number = 1.0;
+		var color:uint = 0;
+		if( gs.fill )
+		{
+			alpha = (gs.fill as GraphicsSolidFill).alpha;
+			color = (gs.fill as GraphicsSolidFill).color;
+		}
+		lineStyle(gs.thickness, color, alpha, gs.pixelHinting, gs.scaleMode, gs.caps, gs.caps, gs.joints, gs.miterLimit);
 	}
 		
 	public static function graphicsGradientFill(result:IGraphicsData):void
 	{
+		finalizePath();
 		var ggf:GraphicsGradientFill = result as GraphicsGradientFill;
-		path = <path/>;
 		beginGradientFill( ggf.type, ggf.colors, ggf.alphas, ggf.ratios, ggf.matrix, ggf.spreadMethod, ggf.interpolationMethod, ggf.focalPointRatio );
 	}
 	
 	private static function beginGradientFill(type:String, colors:Array, alphas:Array, ratios:Array, matrix:Matrix = null, spreadMethod:String = SpreadMethod.PAD, interpolationMethod:String = InterpolationMethod.RGB, focalPointRatio:Number = 0):void {
-		//delete path.@["stroke-opacity"]
+		delete path.@["stroke-opacity"];
 		var gradient:XML = (type == GradientType.LINEAR) ? <linearGradient /> : <radialGradient />;
 		populateGradientElement(gradient, type, colors, alphas, ratios, matrix, spreadMethod, interpolationMethod, focalPointRatio);
 		var id:int = gradients.indexOf(gradient.toXMLString());
@@ -130,6 +142,7 @@ final class Fill
 			gradients.push(gradient.toXMLString());
 		}
 		gradient.@id = "gradient" + id;
+		path.@stroke = "none";
 		path.@fill = "url(#gradient" + id + ")";
 		svg.s::defs.appendChild(gradient);
 	}
@@ -165,5 +178,36 @@ final class Fill
 			if(alphas[i] != 1) { gradientEntry.@["stop-opacity"] = alphas[i]; }
 			gradient.appendChild(gradientEntry);
 		}
+	}
+	
+	private static function lineStyle(thickness:Number = NaN, color:uint = 0, alpha:Number = 1.0, pixelHinting:Boolean = false, scaleMode:String = LineScaleMode.NORMAL, startCaps:String = null, endCaps:String = null, joints:String = null, miterLimit:Number = 3):void {
+		path.@fill = "none";
+		path.@stroke = toHex(color);
+		path.@["stroke-width"] = isNaN(thickness) ? 1 : thickness;
+		if(alpha != 1) { path.@["stroke-opacity"] = alpha; }
+		switch(startCaps) {
+			case CapsStyle.NONE: path.@["stroke-linecap"] = "butt"; break;
+			case CapsStyle.SQUARE: path.@["stroke-linecap"] = "square"; break;
+			default: path.@["stroke-linecap"] = "round"; break;
+		}
+		switch(joints) {
+			case JointStyle.BEVEL: path.@["stroke-linejoin"] = "bevel"; break;
+			case JointStyle.ROUND: path.@["stroke-linejoin"] = "round"; break;
+			default:
+				path.@["stroke-linejoin"] = "miter";
+				if(miterLimit >= 1 && miterLimit != 4) {
+					path.@["stroke-miterlimit"] = miterLimit;
+				}
+				break;
+		}
+	}
+	
+	public static function finalizePath():void
+	{
+		if(path && path.hasOwnProperty("@d"))
+		{
+			svg.s::g.appendChild(path);
+		}
+		path = <path />;
 	}
 }
