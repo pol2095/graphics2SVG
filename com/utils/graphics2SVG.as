@@ -117,10 +117,10 @@ final class Fill
 	{
 		var ggf:GraphicsGradientFill = result as GraphicsGradientFill;
 		path = <path/>;
-		lineGradientStyle( ggf.type, ggf.colors, ggf.alphas, ggf.ratios, ggf.matrix, ggf.spreadMethod, ggf.interpolationMethod, ggf.focalPointRatio );
+		beginGradientFill( ggf.type, ggf.colors, ggf.alphas, ggf.ratios, ggf.matrix, ggf.spreadMethod, ggf.interpolationMethod, ggf.focalPointRatio );
 	}
 	
-	private static function lineGradientStyle(type:String, colors:Array, alphas:Array, ratios:Array, matrix:Matrix = null, spreadMethod:String = SpreadMethod.PAD, interpolationMethod:String = InterpolationMethod.RGB, focalPointRatio:Number = 0):void {
+	private static function beginGradientFill(type:String, colors:Array, alphas:Array, ratios:Array, matrix:Matrix = null, spreadMethod:String = SpreadMethod.PAD, interpolationMethod:String = InterpolationMethod.RGB, focalPointRatio:Number = 0):void {
 		//delete path.@["stroke-opacity"]
 		var gradient:XML = (type == GradientType.LINEAR) ? <linearGradient /> : <radialGradient />;
 		populateGradientElement(gradient, type, colors, alphas, ratios, matrix, spreadMethod, interpolationMethod, focalPointRatio);
