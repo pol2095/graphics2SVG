@@ -56,7 +56,7 @@ final class Fill
 	import flash.geom.Matrix;
 	
 	public static var svg:XML;
-	public static var path:XML;
+	private static var path:XML;
 	
 	public static const s:Namespace = new Namespace("s", "http://www.w3.org/2000/svg");
 	public static const xlink:Namespace = new Namespace("xlink", "http://www.w3.org/1999/xlink");
@@ -133,7 +133,7 @@ final class Fill
 	}
 	
 	private static function beginGradientFill(type:String, colors:Array, alphas:Array, ratios:Array, matrix:Matrix = null, spreadMethod:String = SpreadMethod.PAD, interpolationMethod:String = InterpolationMethod.RGB, focalPointRatio:Number = 0):void {
-		delete path.@["stroke-opacity"]
+		delete path.@["stroke-opacity"];
 		var gradient:XML = (type == GradientType.LINEAR) ? <linearGradient /> : <radialGradient />;
 		populateGradientElement(gradient, type, colors, alphas, ratios, matrix, spreadMethod, interpolationMethod, focalPointRatio);
 		var id:int = gradients.indexOf(gradient.toXMLString());
