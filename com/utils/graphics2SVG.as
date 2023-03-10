@@ -116,7 +116,7 @@ final class Fill
 		finalizePath();
 		var gs:GraphicsStroke = result as GraphicsStroke;
 		var alpha:Number = 1.0;
-		var color:uint = 0
+		var color:uint = 0;
 		if( gs.fill )
 		{
 			alpha = (gs.fill as GraphicsSolidFill).alpha;
