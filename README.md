@@ -1,4 +1,4 @@
-# graphics2SVG 0.5.0
+# graphics2SVG 0.6.0
 
 This project export a vector shape to SVG format.<br/>
 Warning : all features aren't implemented.
