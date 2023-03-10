@@ -16,7 +16,7 @@ package com.utils
 		var result:Vector.<IGraphicsData> = shape.graphics.readGraphicsData(recurse);
 		var width:Number = bounds.x * 2 + bounds.width;
 		var height:Number = bounds.y * 2 + bounds.height;
-		trace( result );
+		
 		XML.prettyIndent = 4;
 		Fill.svg = <svg xmlns={Fill.s.uri} xmlns:xlink={Fill.xlink.uri}><defs/><g/></svg>;
 		Fill.svg.@width = width + "px";
