@@ -62,8 +62,8 @@ final class Fill
 	private static function toHex(color:uint):String
 	{
 		var value:String = color.toString(16);
+		if( value.length > 6 ) value = value.substring( value.length - 6 );
 		var length:int = value.length;
-		if( length > 6 ) value = value.substring( length - 6 );
 		for(var i:int = 0; i < 6 - length; i++)	value = "0" + value;
 		return "#" + value.toUpperCase();
 	}
